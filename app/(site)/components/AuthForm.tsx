@@ -6,6 +6,7 @@ import { useCallback, useState } from 'react'
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 import { AuthSocialButton } from './AuthSocialButton'
 import { BsGithub, BsGoogle } from 'react-icons/bs'
+import axios from 'axios'
 
 type Variant = 'LOGIN' | 'REGISTER'
 
@@ -37,7 +38,7 @@ export function AuthForm() {
     setLoading(true)
     if (variant === 'REGISTER') {
       console.log('registering')
-      //Axios register
+      axios.post('/api/register', data)
     }
     if (variant === 'LOGIN') {
       console.log('signing in')
@@ -62,6 +63,7 @@ export function AuthForm() {
             type="email"
             register={register}
             errors={errors}
+            disabled={isLoading}
           />
           <Input
             id="password"
@@ -69,6 +71,7 @@ export function AuthForm() {
             type="password"
             register={register}
             errors={errors}
+            disabled={isLoading}
           />
           <div>
             <Button disabled={isLoading} fullWidth type="submit">
