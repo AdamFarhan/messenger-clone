@@ -7,6 +7,8 @@ import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 import { AuthSocialButton } from './AuthSocialButton'
 import { BsGithub, BsGoogle } from 'react-icons/bs'
 import axios from 'axios'
+import toast from 'react-hot-toast'
+import { signIn } from 'next-auth/react'
 
 type Variant = 'LOGIN' | 'REGISTER'
 
@@ -38,24 +40,55 @@ export function AuthForm() {
     setLoading(true)
     if (variant === 'REGISTER') {
       console.log('registering')
-      axios.post('/api/register', data)
+      axios
+        .post('/api/register', data)
+        .catch(() => toast.error('Something went wrong'))
+        .finally(() => setLoading(false))
     }
     if (variant === 'LOGIN') {
       console.log('signing in')
-      //NextAuth Sign in
+      signIn('credentials', {
+        ...data,
+        redirect: false,
+      })
+        .then((callback) => {
+          if (callback?.error) {
+            toast.error('Invalid credentials')
+          }
+          if (callback?.ok && !callback?.error) {
+            toast.success('Logged in!')
+          }
+        })
+        .finally(() => setLoading(false))
     }
   }
 
   const socialAction = (action: string) => {
     setLoading(true)
-    //NextAuth Social Sign in
+
+    signIn(action, { redirect: false })
+      .then((callback) => {
+        if (callback?.error) {
+          toast.error('Invalid credentials')
+        }
+        if (callback?.ok && !callback?.error) {
+          toast.success('Logged in!')
+        }
+      })
+      .finally(() => setLoading(false))
   }
   return (
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <div className="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
         <form className=" space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {variant === 'REGISTER' && (
-            <Input id="name" label="Name" register={register} errors={errors} />
+            <Input
+              id="name"
+              label="Name"
+              register={register}
+              errors={errors}
+              disabled={isLoading}
+            />
           )}
           <Input
             id="email"
