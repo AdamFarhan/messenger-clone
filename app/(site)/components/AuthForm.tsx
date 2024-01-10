@@ -69,7 +69,7 @@ export function AuthForm() {
           }
           if (callback?.ok && !callback?.error) {
             toast.success('Logged in!')
-            router.push('/users')
+            router.push('/conversations')
           }
         })
         .finally(() => setLoading(false))
